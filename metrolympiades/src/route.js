@@ -1,13 +1,29 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
+import UserProfile from './pages/UserProfile.vue';
+import HomePage from './pages/HomePage.vue';
 import RegisterPage from './pages/RegisterPage.vue';
 import LoginPage from './pages/LoginPage.vue';
 
 const routes = [
-    {
-        path: '/',
-        redirect: '/register'
-      },
+  {
+    path: '/',
+    name: 'home',
+    component: HomePage,
+    // La propriété meta permet de définir des métadonnées pour une route.
+    // On peut y stocker des informations supplémentaires, comme ici l'information que la route nécessite une authentification.
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/user/:username",
+    name: "user",
+    component: UserProfile,
+    meta: {
+      requiresAuth: true
+    }
+  },
   {
     path: "/register",
     name: "register",
