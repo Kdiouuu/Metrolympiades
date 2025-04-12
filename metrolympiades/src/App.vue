@@ -1,18 +1,18 @@
-<template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
-</template>
+<script setup>
+import { useRouter } from 'vue-router';
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
+const router = useRouter();
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
+function goToProfile() {
+  router.push("/");
 }
 </script>
+
+<template>
+  <img alt="Vue logo" src="./assets/logo.png">
+  <button @click="goToProfile">Go to Profile</button>
+  <router-view />
+</template>
 
 <style>
 #app {
