@@ -1,5 +1,5 @@
 <script setup>
-import AppNavbar from "@/components/AppNavbar.vue";
+import AppNavbar from "./components/AppNavbar.vue";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 
@@ -17,6 +17,8 @@ const showNavbar = computed(() => {
   <main>
     <div class="container">
       <RouterView />
+
+      
     </div>
   </main>
 </template>
