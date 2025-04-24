@@ -1,8 +1,21 @@
 <template>
   <div class="container">
-    <h1>Mon Équipe</h1>
+    <div class="flex justify-between items-center mb-4">
+      <template v-if="editName">
+        <input
+          v-model="team.name"
+          class="input mr-2"
+          placeholder="Nom de l'équipe"
+        />
+        <button @click="saveTeamName" class="button">💾</button>
+      </template>
+      <template v-else>
+        <h1 class="text-xl font-bold">{{ team?.name || 'Mon Équipe' }}</h1>
+        <button @click="editName = true" class="ml-2 text-gray-500 hover:text-gray-700 text-xl">✏️</button>
+      </template>
+    </div>
+
     <div v-if="team">
-      <h2>{{ team.name }}</h2>
       <div class="flex mb-4">
         <input
           v-model="newMember"
@@ -35,13 +48,18 @@ import axios from 'axios'
 
 const team = ref(null)
 const newMember = ref('')
+const editName = ref(false)
+
+async function saveTeamName() {
+  editName.value = false
+  await updateTeam()
+}
 
 async function fetchTeam() {
   try {
     const res = await axios.get('http://localhost:3000/teams/me', {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
-    // Ensure members is always an array
     team.value = {
       ...res.data,
       members: Array.isArray(res.data.members) ? res.data.members : []
@@ -55,8 +73,15 @@ async function updateTeam() {
   try {
     await axios.put(
       'http://localhost:3000/teams/me',
-      { name: team.value.name, members: team.value.members },
-      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      {
+        name: team.value.name,
+        members: team.value.members
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
     )
   } catch (error) {
     console.error('Error updating team:', error)
@@ -66,7 +91,6 @@ async function updateTeam() {
 function addMember() {
   const name = newMember.value.trim()
   if (!name) return
-  // Initialize members array if null/undefined
   if (!Array.isArray(team.value.members)) {
     team.value.members = []
   }
@@ -83,6 +107,7 @@ function removeMember(index) {
 
 onMounted(fetchTeam)
 </script>
+
 
 <style scoped>
 .container {
