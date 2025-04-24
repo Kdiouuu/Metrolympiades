@@ -1,43 +1,40 @@
-<script setup>
-import { ArrowRightStartOnRectangleIcon } from "@heroicons/vue/24/outline";
-import { useUserData } from "@/composables/useUserData";
-
-const { user } = useUserData();
-
-function logout() {
-  localStorage.removeItem("user");
-  location.reload();
-}
-</script>
-
 <template>
-  <header class="navbar">
-    <div class="navbar__user" v-if="user">
-      <img :src="user.avatarUrl" alt="user avatar" class="avatar" height="36" width="36" />
-      <b>{{ user.username }}</b>
-    </div>
+  <nav class="navbar">
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+      <div class="brand">
+        <RouterLink :to="isAuthenticated ? '/dashboard' : '/' " class="brand">Metrolympiades</RouterLink>
+      </div>
 
-    <button class="btn-icon btn-icon--large" @click="logout">
-      <ArrowRightStartOnRectangleIcon />
-    </button>
-  </header>
+      <ul>
+        <li><RouterLink to="/ranking">Classement</RouterLink></li>
+
+        <template v-if="!isAuthenticated">
+          <li><RouterLink to="/login">Se connecter</RouterLink></li>
+          <li><RouterLink to="/register">S'inscrire</RouterLink></li>
+        </template>
+
+        <template v-else>
+          <li><RouterLink to="/team">Mon équipe</RouterLink></li>
+          <li><RouterLink to="/matches">Mes matchs</RouterLink></li>
+          <li><RouterLink to="/new-match">Nouveau match</RouterLink></li>
+          <li><button @click="handleLogout">Déconnexion</button></li>
+        </template>
+      </ul>
+    </div>
+  </nav>
 </template>
 
-<style scoped>
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  border-bottom: 1px solid var(--color-border);
-  position: sticky;
-  top: 0;
-  background-color: var(--color-bg-primary);
-  z-index: 1;
+<script setup>
+import { computed } from 'vue'
+import { useAuthStore } from '@/store/auth'
+import { useRouter } from 'vue-router'
+
+const auth = useAuthStore()
+const router = useRouter()
+const isAuthenticated = computed(() => auth.isAuthenticated)
+
+function handleLogout() {
+  auth.logout()
+  router.push('/login')
 }
-.navbar__user {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-</style>
+</script>

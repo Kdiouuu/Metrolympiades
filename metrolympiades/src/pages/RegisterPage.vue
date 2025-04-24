@@ -1,90 +1,102 @@
+<template>
+  <div class="container">
+    <h1>Créer un compte</h1>
+    <form @submit.prevent="handleRegister">
+      <input
+        v-model="form.username"
+        type="text"
+        placeholder="Nom d'utilisateur"
+        class="input"
+        required
+      />
+      <input
+        v-model="form.email"
+        type="email"
+        placeholder="Email"
+        class="input"
+        required
+      />
+      <input
+        v-model="form.password"
+        type="password"
+        placeholder="Mot de passe"
+        class="input"
+        required
+      />
+      <input
+        v-model="form.teamName"
+        type="text"
+        placeholder="Nom de l'équipe"
+        class="input"
+        required
+      />
+      <button type="submit" class="button">S'inscrire</button>
+    </form>
+
+    <p v-if="error" class="error">{{ error }}</p>
+
+    <p style="margin-top: 1rem;">
+      Déjà un compte ?
+      <RouterLink to="/login">Connecte-toi</RouterLink>
+    </p>
+  </div>
+</template>
+
 <script setup>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/store/auth'
 
+const form = reactive({
+  email: '',
+  username: '',
+  password: '',
+  teamName: '',
+})
 
-const router = useRouter();
+const error = ref('')
+const router = useRouter()
+const authStore = useAuthStore()
 
-const username = ref("");
-const email = ref("");
-const password = ref("");
-
-const isFormValid = computed(() => {
-  return !!username.value.trim() && !!email.value.trim() && !!password.value.trim();
-});
-
-const isLoading = ref(false);
-
-function register() {
-  isLoading.value = true;
-
-  fetch("https://posts-crud-api.vercel.app/register", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username: username.value,
-      email: email.value,
-      password: password.value,
-    }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      localStorage.setItem("user", JSON.stringify(data));
-      router.push("/");
-    })
-    .catch((err) => {
-      console.error(err);
-    })
-    .finally(() => {
-      isLoading.value = false;
-    });
+const handleRegister = async () => {
+  error.value = ''
+  try {
+    await authStore.register(form)
+    router.push('/dashboard')
+  } catch (err) {
+    error.value = 'Inscription échouée : ' + (err.message || 'Vérifie les champs')
+  }
 }
 </script>
 
-<template>
-  <form @submit.prevent="register">
-    <h1 style="margin-bottom: 1rem">Créer un compte</h1>
-    <input
-      type="text"
-      id="username"
-      name="username"
-      required
-      v-model="username"
-      placeholder="Nom d'utilisateur"
-    />
-    <input
-      type="email"
-      id="email"
-      name="email"
-      autocomplete="email"
-      required
-      v-model="email"
-      placeholder="Email"
-    />
-    <input
-      type="password"
-      id="password"
-      name="password"
-      autocomplete="new-password"
-      required
-      v-model="password"
-      placeholder="Mot de passe"
-    />
-    <button type="submit" :disabled="!isFormValid || isLoading" :class="{ loading: isLoading }">
-      Créer un compte
-    </button>
-    <router-link to="/login" class="login_link">Je possède déjà un compte</router-link>
-  </form>
-</template>
-
-<style>
-.login_link {
+<style scoped>
+.container {
+  max-width: 400px;
+  margin: 2rem auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.input {
   display: block;
-  text-align: center;
+  width: 100%;
+  padding: 0.8rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+.button {
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.error {
+  color: red;
   margin-top: 1rem;
-  font-weight: 500;
-  font-size: 0.9rem;
 }
 </style>
