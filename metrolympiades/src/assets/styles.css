@@ -1,6 +1,6 @@
 /* styles.css */
 
-/* Reset/minimum */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -14,7 +14,7 @@
     color: #333;
   }
   
-  /* Container centrée */
+  
   .container {
     max-width: 960px;
     margin: 2rem auto;
@@ -24,7 +24,7 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   }
   
-  /* Navbar */
+
   .navbar {
     background-color: #007bff;
     color: #fff;
@@ -76,7 +76,7 @@
     background-color: #0056b3;
   }
   
-  /* Listes */
+
   .list-group {
     list-style: none;
     margin: 1rem 0;
@@ -86,7 +86,7 @@
     border-bottom: 1px solid #eee;
   }
   
-  /* Titres */
+
   h1 {
     margin-bottom: 1rem;
     color: #222;

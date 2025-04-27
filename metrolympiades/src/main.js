@@ -5,7 +5,7 @@ import { createPinia } from 'pinia'
 import './assets/styles.css'
 import axios from 'axios'
 
-import { useAuthStore } from '@/store/auth' // ← importer le store
+import { useAuthStore } from '@/store/auth' 
 
 const app = createApp(App)
 

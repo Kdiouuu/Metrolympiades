@@ -3,12 +3,12 @@
     <div class="container">
       <RouterLink :to="isAuthenticated ? '/dashboard' : '/'" class="brand">Metrolympiades</RouterLink>
       
-      <!-- bouton hamburger -->
+      
       <button class="menu-toggle" @click="toggleMenu">
         <span class="hamburger"></span>
       </button>
 
-      <!-- liens -->
+      
       <ul :class="['nav-links', { active: isMenuOpen }]">
         <li><RouterLink to="/ranking" @click="closeMenu">Classement</RouterLink></li>
 
@@ -36,7 +36,7 @@ const auth = useAuthStore()
 const router = useRouter()
 const isAuthenticated = computed(() => auth.isAuthenticated)
 
-// État du menu (ouvert/fermé)
+
 const isMenuOpen = ref(false)
 
 function toggleMenu() {
@@ -127,11 +127,11 @@ function handleLogout() {
   bottom: -8px;
 }
 
-/* Menu déroulant mobile */
+
 .nav-links.active {
   display: block;
   position: absolute;
-  top: 60px; /* ajuster selon la hauteur de la navbar */
+  top: 60px; 
   left: 0;
   right: 0;
   background-color: #007bff;
@@ -159,7 +159,6 @@ function handleLogout() {
     display: block;
   }
 
-  /* Animation hamburger -> croix */
   .menu-toggle.open .hamburger {
     transform: rotate(45deg);
   }

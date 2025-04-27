@@ -21,7 +21,7 @@ const router = useRouter()
 const user = auth.user
 
 onMounted(() => {
-  // Redirige vers login si non connecté
+ 
   if (!auth.token || !auth.user) {
     router.push('/login')
   }
