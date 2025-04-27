@@ -1,11 +1,11 @@
 <template>
-  <div class="container" style="max-width:400px;">
+  <div class="container">
     <h1>Nouveau Match</h1>
     <form @submit.prevent="createMatch">
       <div>
         <label for="team2">Équipe adverse</label>
         <select v-model="team2Id" id="team2" class="input">
-          <option v-for="team in teams" :key="team.id" :value="team.id">
+          <option v-for="team in filteredTeams" :key="team.id" :value="team.id">
             {{ team.name }}
           </option>
         </select>
@@ -21,8 +21,18 @@
       </div>
 
       <div>
-        <label for="time">Heure du match</label>
+        <label for="time">Date et heure du match</label>
         <input v-model="time" type="datetime-local" id="time" class="input" />
+      </div>
+
+      <div>
+        <label for="team1Score">Score de mon équipe</label>
+        <input v-model.number="team1Score" type="number" min="0" class="input" />
+      </div>
+
+      <div>
+        <label for="team2Score">Score de l'équipe adverse</label>
+        <input v-model.number="team2Score" type="number" min="0" class="input" />
       </div>
 
       <button class="button">Enregistrer</button>
@@ -31,20 +41,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
 const team2Id = ref('')
 const activityId = ref('')
 const time = ref('')
+const team1Score = ref(0)
+const team2Score = ref(0)
 const teams = ref([])
 const activities = ref([])
+const myTeamId = ref('')
 const router = useRouter()
 
-// Récupère la liste des équipes et des activités disponibles
+const filteredTeams = computed(() => teams.value.filter(team => team.id !== myTeamId.value))
+
 onMounted(async () => {
   try {
+    const teamRes = await axios.get('http://localhost:3000/teams/me', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+    myTeamId.value = teamRes.data.id
+
     const teamsResponse = await axios.get('http://localhost:3000/teams', {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
@@ -53,27 +72,48 @@ onMounted(async () => {
     const activitiesResponse = await axios.get('http://localhost:3000/activities')
     activities.value = activitiesResponse.data
   } catch (e) {
-    console.error('Error fetching teams or activities:', e)
+    console.error('Erreur lors du chargement :', e)
   }
 })
 
 async function createMatch() {
   try {
+    if (!team2Id.value || !activityId.value || !time.value) {
+      alert('Merci de remplir tous les champs !')
+      return
+    }
+
+    if (team2Id.value === myTeamId.value) {
+      alert("Tu ne peux pas jouer contre ta propre équipe !")
+      return
+    }
+
     const matchData = {
       team2Id: team2Id.value,
       activityId: activityId.value,
-      startedAt: time.value,
-      team1Score: 0,  // Vous pouvez initialiser les scores à 0 par défaut
-      team2Score: 0
+      startedAt: new Date(time.value).toISOString(),
+      team1Score: team1Score.value,
+      team2Score: team2Score.value
     }
+
+    console.log('Données envoyées :', matchData)
+
     await axios.post('http://localhost:3000/matches', matchData, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
-    router.push('/games')  // Redirige vers la page des matchs après la création
+
+    alert('Match créé avec succès !')
+    router.push('/matches')
+
   } catch (e) {
-    console.error('Error creating match:', e)
+    if (e.response && e.response.data.message === "Match already exists") {
+      alert('Tu as déjà un match contre cette équipe pour cette activité.')
+    } else {
+      console.error('Erreur lors de la création du match :', e)
+    }
   }
 }
+
 </script>
 
 <style scoped>

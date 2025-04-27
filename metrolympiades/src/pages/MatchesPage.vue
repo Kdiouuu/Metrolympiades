@@ -4,7 +4,9 @@
     <ul class="list-group">
       <li v-for="m in matches" :key="m.id" class="list-group-item">
         <div class="match-info">
-          <span class="teams">{{ m.team1 }} vs {{ m.team2 }}</span>
+          <span :class="teamClass(m, 'team1')">{{ m.team1 }}</span>
+          vs
+          <span :class="teamClass(m, 'team2')">{{ m.team2 }}</span>
           <span class="activity">{{ m.activity }}</span>
         </div>
         <div class="match-details">
@@ -25,6 +27,19 @@ const matches = ref([])
 const formatDate = iso => {
   const d = new Date(iso)
   return d.toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })
+}
+
+function teamClass(match, team) {
+  const s1 = match.team1Score
+  const s2 = match.team2Score
+  if (s1 === s2) return ''
+  if (team === 'team1') {
+    return s1 > s2 ? 'winner' : 'loser'
+  }
+  if (team === 'team2') {
+    return s2 > s1 ? 'winner' : 'loser'
+  }
+  return ''
 }
 
 onMounted(async () => {
@@ -63,13 +78,11 @@ h1 {
 .match-info {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
-  font-weight: bold;
-}
-.teams {
-  color: #333;
 }
 .activity {
+  font-style: italic;
   color: #555;
 }
 .match-details {
@@ -81,5 +94,12 @@ h1 {
 .score {
   font-weight: bold;
   color: #000;
+}
+.winner {
+  color: #28a745;
+  font-weight: bold;
+}
+.loser {
+  color: #dc3545; 
 }
 </style>
